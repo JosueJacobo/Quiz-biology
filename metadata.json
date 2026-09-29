@@ -1,0 +1,6 @@
+{
+  "name": "BioQuiz: Reino Vivo",
+  "description": "Juego de trivia de botánica y zoología con 100 niveles y clasificación en tiempo real",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
