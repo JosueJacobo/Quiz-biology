@@ -53,6 +53,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.models.BiomeWorld
+import com.example.data.models.DifficultyTier
 import com.example.data.models.LevelProgress
 import com.example.data.models.User
 import com.example.ui.theme.BioAmber
@@ -170,7 +171,7 @@ fun LevelsMapScreen(
     progressList: List<LevelProgress>,
     onStartLevel: (Int) -> Unit
 ) {
-    var selectedBiomeFilter by remember { mutableStateOf<BiomeWorld?>(null) }
+    var selectedDifficulty by remember { mutableStateOf<DifficultyTier?>(null) }
 
     val progressMap = remember(progressList) {
         progressList.associateBy { it.levelNumber }
@@ -181,11 +182,11 @@ fun LevelsMapScreen(
     val totalStars = progressList.sumOf { it.starsEarned }
 
     val allLevels = (1..100).toList()
-    val displayedLevels = remember(selectedBiomeFilter) {
-        if (selectedBiomeFilter == null) {
+    val displayedLevels = remember(selectedDifficulty) {
+        if (selectedDifficulty == null) {
             allLevels
         } else {
-            allLevels.filter { it in selectedBiomeFilter!!.startLevel..selectedBiomeFilter!!.endLevel }
+            allLevels.filter { it in selectedDifficulty!!.levelRange }
         }
     }
 
@@ -277,7 +278,13 @@ fun LevelsMapScreen(
             }
         }
 
-        // Biome Filter Carousel
+        // Difficulty Level Carousel Filter
+        Text(
+            text = "Filtrar por Nivel de Dificultad:",
+            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+        )
         LazyRow(
             contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -285,24 +292,24 @@ fun LevelsMapScreen(
         ) {
             item {
                 FilterChip(
-                    selected = selectedBiomeFilter == null,
-                    onClick = { selectedBiomeFilter = null },
-                    label = { Text("Todos (1-100)") },
+                    selected = selectedDifficulty == null,
+                    onClick = { selectedDifficulty = null },
+                    label = { Text("Todos los Niveles (100)") },
                     colors = FilterChipDefaults.filterChipColors(
                         selectedContainerColor = BioForestGreen,
                         selectedLabelColor = Color.White
                     )
                 )
             }
-            items(BiomeWorld.entries) { biome ->
+            items(DifficultyTier.entries) { tier ->
                 FilterChip(
-                    selected = selectedBiomeFilter == biome,
+                    selected = selectedDifficulty == tier,
                     onClick = {
-                        selectedBiomeFilter = if (selectedBiomeFilter == biome) null else biome
+                        selectedDifficulty = if (selectedDifficulty == tier) null else tier
                     },
-                    label = { Text("${biome.iconEmoji} ${biome.startLevel}-${biome.endLevel}") },
+                    label = { Text("${tier.iconEmoji} ${tier.shortName} (${tier.startLevel}-${tier.endLevel})") },
                     colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = Color(biome.themeColorHex),
+                        selectedContainerColor = Color(tier.colorHex),
                         selectedLabelColor = Color.White
                     )
                 )
@@ -327,12 +334,15 @@ fun LevelsMapScreen(
                 val title = LevelTitles[levelNum] ?: "Nivel $levelNum"
                 val biome = BiomeWorld.forLevel(levelNum)
 
+                val tier = DifficultyTier.forLevel(levelNum)
+
                 LevelGridCard(
                     levelNumber = levelNum,
                     title = title,
                     stars = stars,
                     isUnlocked = isUnlocked,
                     biomeEmoji = biome.iconEmoji,
+                    tier = tier,
                     onClick = {
                         if (isUnlocked) {
                             onStartLevel(levelNum)
@@ -351,6 +361,7 @@ fun LevelGridCard(
     stars: Int,
     isUnlocked: Boolean,
     biomeEmoji: String,
+    tier: DifficultyTier = DifficultyTier.forLevel(levelNumber),
     onClick: () -> Unit
 ) {
     Card(
@@ -420,18 +431,37 @@ fun LevelGridCard(
                 overflow = TextOverflow.Ellipsis
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
-            Surface(
-                color = if (isUnlocked) BioEmerald.copy(alpha = 0.12f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
-                shape = RoundedCornerShape(4.dp)
+            // Badges Row: Difficulty + 50+ Questions
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "50+ preguntas",
-                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp, fontWeight = FontWeight.Medium),
-                    color = if (isUnlocked) BioEmerald else MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
-                )
+                Surface(
+                    color = Color(tier.colorHex).copy(alpha = 0.15f),
+                    shape = RoundedCornerShape(4.dp)
+                ) {
+                    Text(
+                        text = "${tier.iconEmoji} ${tier.shortName}",
+                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp, fontWeight = FontWeight.Bold),
+                        color = Color(tier.colorHex),
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                    )
+                }
+
+                Surface(
+                    color = if (isUnlocked) BioEmerald.copy(alpha = 0.12f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+                    shape = RoundedCornerShape(4.dp)
+                ) {
+                    Text(
+                        text = "50+ preg.",
+                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp, fontWeight = FontWeight.Medium),
+                        color = if (isUnlocked) BioEmerald else MaterialTheme.colorScheme.outline,
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))

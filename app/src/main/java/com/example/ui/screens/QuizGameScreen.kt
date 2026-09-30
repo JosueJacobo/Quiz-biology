@@ -109,13 +109,31 @@ fun QuizGameScreen(
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                     Column {
-                        Text(
-                            text = "Nivel ${state.levelNumber}",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = BioForestGreen
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "Nivel ${state.levelNumber}",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = BioForestGreen
+                                )
                             )
-                        )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            val tier = com.example.data.models.DifficultyTier.forLevel(state.levelNumber)
+                            Surface(
+                                color = Color(tier.colorHex).copy(alpha = 0.15f),
+                                shape = RoundedCornerShape(4.dp)
+                            ) {
+                                Text(
+                                    text = "${tier.iconEmoji} ${tier.shortName}",
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 10.sp
+                                    ),
+                                    color = Color(tier.colorHex),
+                                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
+                                )
+                            }
+                        }
                         Text(
                             text = levelTitle,
                             style = MaterialTheme.typography.bodySmall,

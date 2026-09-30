@@ -118,3 +118,80 @@ enum class BiomeWorld(
         }
     }
 }
+
+enum class DifficultyTier(
+    val id: Int,
+    val title: String,
+    val shortName: String,
+    val startLevel: Int,
+    val endLevel: Int,
+    val iconEmoji: String,
+    val colorHex: Long,
+    val pointsPerAnswer: Int,
+    val description: String
+) {
+    EASY(
+        id = 1,
+        title = "Principiante / Fácil",
+        shortName = "Fácil",
+        startLevel = 1,
+        endLevel = 20,
+        iconEmoji = "🌱",
+        colorHex = 0xFF2E7D32,
+        pointsPerAnswer = 100,
+        description = "Botánica básica: órganos vegetales, tejidos y fotosíntesis"
+    ),
+    INTERMEDIATE(
+        id = 2,
+        title = "Intermedio",
+        shortName = "Intermedio",
+        startLevel = 21,
+        endLevel = 40,
+        iconEmoji = "🌿",
+        colorHex = 0xFF00897B,
+        pointsPerAnswer = 150,
+        description = "Invertebrados: artrópodos, moluscos, corales y defensas"
+    ),
+    ADVANCED(
+        id = 3,
+        title = "Avanzado",
+        shortName = "Avanzado",
+        startLevel = 41,
+        endLevel = 60,
+        iconEmoji = "🌲",
+        colorHex = 0xFFE65100,
+        pointsPerAnswer = 200,
+        description = "Vertebrados: aves, reptiles, cetáceos y morfología"
+    ),
+    EXPERT(
+        id = 4,
+        title = "Experto",
+        shortName = "Experto",
+        startLevel = 61,
+        endLevel = 80,
+        iconEmoji = "🔬",
+        colorHex = 0xFF8E24AA,
+        pointsPerAnswer = 250,
+        description = "Fisiología y bioquímica: defensas químicas, sistemas y sentidos"
+    ),
+    MASTER(
+        id = 5,
+        title = "Maestro de la Biosfera",
+        shortName = "Maestro",
+        startLevel = 81,
+        endLevel = 100,
+        iconEmoji = "👑",
+        colorHex = 0xFFC67C00,
+        pointsPerAnswer = 300,
+        description = "Ecología extrema, abismos marinos, biomas polares y homeostasis"
+    );
+
+    val levelRange: IntRange get() = startLevel..endLevel
+
+    companion object {
+        fun forLevel(level: Int): DifficultyTier {
+            return entries.firstOrNull { level in it.startLevel..it.endLevel } ?: EASY
+        }
+    }
+}
+

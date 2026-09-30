@@ -3,6 +3,7 @@ package com.example.ui.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.data.models.DifficultyTier
 import com.example.data.models.LeaderboardPlayer
 import com.example.data.models.LevelProgress
 import com.example.data.models.Question
@@ -110,7 +111,8 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
         val isCorrect = optionIndex == currentQ.correctOptionIndex
 
         val newStreak = if (isCorrect) current.currentStreak + 1 else 0
-        val pointsToAdd = if (isCorrect) 100 + (newStreak * 25) else 0
+        val tier = DifficultyTier.forLevel(current.levelNumber)
+        val pointsToAdd = if (isCorrect) tier.pointsPerAnswer + (newStreak * 25) else 0
         val newCorrectCount = if (isCorrect) current.correctAnswersCount + 1 else current.correctAnswersCount
 
         _quizState.value = current.copy(
