@@ -7,5 +7,4 @@
 /app/build
 .build-outputs/
 capture/
-.env
 *.apk
