@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1B5E20"/>
+      <stop offset="100%" stop-color="#003300"/>
+    </linearGradient>
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#69F0AE"/>
+      <stop offset="100%" stop-color="#00C853"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD54F"/>
+      <stop offset="100%" stop-color="#FF9800"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="110" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="190" fill="none" stroke="#2E7D32" stroke-width="8" opacity="0.6"/>
+  
+  <!-- Stylized Leaf & DNA Helix Logo -->
+  <path d="M 256,90 C 370,120 400,240 370,350 C 340,300 300,270 256,260 C 212,270 172,300 142,350 C 112,240 142,120 256,90 Z" fill="url(#leafGrad)"/>
+  <path d="M 256,90 L 256,420" stroke="#0D5316" stroke-width="12" stroke-linecap="round"/>
+  <path d="M 256,170 Q 310,190 340,240" stroke="#0D5316" stroke-width="6" fill="none"/>
+  <path d="M 256,220 Q 202,240 172,290" stroke="#0D5316" stroke-width="6" fill="none"/>
+  <path d="M 256,270 Q 310,290 340,340" stroke="#0D5316" stroke-width="6" fill="none"/>
+  
+  <!-- Quiz Star Badge -->
+  <circle cx="256" cy="400" r="45" fill="#0A1F0D" stroke="url(#gold)" stroke-width="6"/>
+  <path d="M 256,375 L 263,392 L 282,393 L 267,405 L 272,423 L 256,412 L 240,423 L 245,405 L 230,393 L 249,392 Z" fill="url(#gold)"/>
+</svg>

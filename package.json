@@ -1,0 +1,21 @@
+{
+  "name": "bioquiz-reino-vivo",
+  "version": "1.0.0",
+  "description": "BioQuiz: Reino Vivo - Trivia interactiva de botánica y zoología con 100 niveles",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "build": "echo 'Build complete'"
+  },
+  "keywords": [
+    "biology",
+    "quiz",
+    "botany",
+    "zoology",
+    "trivia",
+    "pwa"
+  ],
+  "author": "BioQuiz Team",
+  "license": "MIT"
+}

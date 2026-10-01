@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>BioQuiz: Reino Vivo</title>
+  
+  <!-- SEO & PWA Meta -->
+  <meta name="description" content="Juego interactivo de trivia biológica con 100 niveles de botánica y zoología, clasificación y banco de preguntas.">
+  <meta name="theme-color" content="#07170a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app-container">
+    
+    <!-- Top Header Bar -->
+    <header class="top-header">
+      <div class="brand-section">
+        <img src="icons/icon.svg" alt="BioQuiz Logo" class="brand-logo">
+        <span class="brand-title">BioQuiz</span>
+      </div>
+      <div class="header-stats">
+        <div class="stat-chip gold">
+          <span>★</span>
+          <span id="header-stars">0</span>
+        </div>
+        <div class="stat-chip">
+          <span id="header-level-badge">Niv. 1</span>
+        </div>
+        <div class="stat-chip">
+          <span id="header-score">0</span>
+          <span style="font-size: 0.65rem; color: var(--text-dim);">PTS</span>
+        </div>
+        <button id="sound-toggle-btn" class="btn-icon" title="Sonido" aria-label="Alternar sonido">🔊</button>
+      </div>
+    </header>
+
+    <!-- Main Viewport -->
+    <main class="view-viewport">
+
+      <!-- ===================================================================
+           SCREEN 1: LEVELS MAP
+           =================================================================== -->
+      <section id="screen-levels" class="screen active">
+        <!-- Progress Summary Card -->
+        <div class="levels-header-card">
+          <div class="levels-header-title">100 Niveles de Biodiversidad</div>
+          <div class="levels-header-sub">Supera cada nivel con al menos 1 estrella para desbloquear el siguiente.</div>
+          
+          <div class="progress-bar-container">
+            <div id="levels-progress-bar" class="progress-bar-fill"></div>
+          </div>
+          
+          <div class="progress-label-row">
+            <span id="levels-progress-text">0 / 100 Completados</span>
+            <span id="levels-stars-text">0 / 300 ★</span>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div style="margin-bottom: 12px;">
+          <input type="text" id="levels-search-input" class="input-field" placeholder="🔍 Buscar por tema (ej. Flor, Reptiles, ADN, Darwin)..." style="margin-bottom: 0;">
+        </div>
+
+        <!-- Difficulty Filter Chips -->
+        <div class="filter-scroll-wrapper">
+          <button class="filter-chip active" data-tier="all">Todos (1-100)</button>
+          <button class="filter-chip" data-tier="tier1">🌱 Fácil (1-20)</button>
+          <button class="filter-chip" data-tier="tier2">🌿 Intermedio (21-40)</button>
+          <button class="filter-chip" data-tier="tier3">🌲 Avanzado (41-60)</button>
+          <button class="filter-chip" data-tier="tier4">🔬 Experto (61-80)</button>
+          <button class="filter-chip" data-tier="tier5">👑 Maestro (81-100)</button>
+        </div>
+
+        <!-- 100 Levels Dynamic Grid -->
+        <div id="levels-grid-container" class="levels-grid"></div>
+      </section>
+
+      <!-- ===================================================================
+           SCREEN 2: QUIZ GAMEPLAY
+           =================================================================== -->
+      <section id="screen-quiz" class="screen">
+        <div class="quiz-screen-header">
+          <button id="quiz-back-btn" class="btn-back">
+            <span>‹</span> Salir
+          </button>
+          <div class="quiz-level-indicator">
+            <div id="quiz-level-indicator-text" class="quiz-level-name">Nivel 1</div>
+          </div>
+          <div id="quiz-streak-counter" class="quiz-streak-badge">🔥 0</div>
+        </div>
+
+        <!-- Animated Timer Bar -->
+        <div class="quiz-timer-bar-wrap">
+          <div id="quiz-timer-bar" class="quiz-timer-bar-fill"></div>
+        </div>
+
+        <!-- Question Card -->
+        <div class="question-card">
+          <div class="question-meta-row">
+            <span id="quiz-question-counter">Pregunta 1 de 10</span>
+            <span id="quiz-points-val">+100 pts</span>
+          </div>
+          <h2 id="quiz-question-text" class="question-text">Cargando pregunta...</h2>
+        </div>
+
+        <!-- Multiple Choice Options -->
+        <div id="quiz-options-container" class="options-list"></div>
+
+        <!-- Educational Explanation Card -->
+        <div id="quiz-explanation-box" class="explanation-card"></div>
+
+        <!-- Next Question Action Button -->
+        <button id="next-question-btn" class="btn-primary" style="display: none;">
+          Siguiente Pregunta ➔
+        </button>
+      </section>
+
+      <!-- ===================================================================
+           SCREEN 3: LEADERBOARD
+           =================================================================== -->
+      <section id="screen-leaderboard" class="screen">
+        <h2 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 4px;">Salón de la Biodiversidad</h2>
+        <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 12px;">Compite contra los naturalistas más ilustres de la historia.</p>
+
+        <!-- Top 3 Podium -->
+        <div id="leaderboard-podium" class="podium-container"></div>
+
+        <!-- Scrollable Leaderboard List -->
+        <div id="leaderboard-list" class="leaderboard-list"></div>
+      </section>
+
+      <!-- ===================================================================
+           SCREEN 4: PROFILE
+           =================================================================== -->
+      <section id="screen-profile" class="screen">
+        <div class="profile-card">
+          <div id="profile-rank-title" style="font-size: 1.15rem; font-weight: 800; color: var(--accent); margin-bottom: 8px;">
+            Biólogo Principiante
+          </div>
+          <p style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 12px;">Selecciona tu avatar naturalista:</p>
+          
+          <div class="avatar-selector">
+            <span class="avatar-opt selected" data-avatar="🌿">🌿</span>
+            <span class="avatar-opt" data-avatar="🔬">🔬</span>
+            <span class="avatar-opt" data-avatar="🦋">🦋</span>
+            <span class="avatar-opt" data-avatar="🧬">🧬</span>
+            <span class="avatar-opt" data-avatar="🦁">🦁</span>
+            <span class="avatar-opt" data-avatar="🍄">🍄</span>
+            <span class="avatar-opt" data-avatar="🌵">🌵</span>
+            <span class="avatar-opt" data-avatar="🐢">🐢</span>
+          </div>
+
+          <div style="display: flex; gap: 8px; margin-top: 14px;">
+            <input type="text" id="profile-name-input" class="input-field" placeholder="Tu Nombre de Biólogo..." maxlength="24" style="margin-bottom: 0;">
+            <button id="save-name-btn" class="btn-primary" style="width: auto; padding: 0 18px; font-size: 0.9rem;">Guardar</button>
+          </div>
+        </div>
+
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 10px;">Tus Estadísticas Científicas</h3>
+        <div class="stats-grid">
+          <div class="stat-tile">
+            <div id="profile-total-score" class="stat-tile-val">0</div>
+            <div class="stat-tile-lbl">Puntaje Acumulado</div>
+          </div>
+          <div class="stat-tile">
+            <div id="profile-levels-completed" class="stat-tile-val">0 / 100</div>
+            <div class="stat-tile-lbl">Niveles Aprobados</div>
+          </div>
+          <div class="stat-tile">
+            <div id="profile-stars-total" class="stat-tile-val">0 ★</div>
+            <div class="stat-tile-lbl">Estrellas Ganadas</div>
+          </div>
+          <div class="stat-tile">
+            <div id="profile-best-streak" class="stat-tile-val">🔥 0</div>
+            <div class="stat-tile-lbl">Mejor Racha Consecutiva</div>
+          </div>
+          <div class="stat-tile" style="grid-column: 1 / -1;">
+            <div id="profile-accuracy" class="stat-tile-val" style="color: var(--gold);">0%</div>
+            <div class="stat-tile-lbl">Precisión Global de Respuestas</div>
+          </div>
+        </div>
+
+        <button id="reset-progress-btn" class="btn-secondary" style="width: 100%; color: var(--danger); border-color: rgba(255, 82, 82, 0.4); margin-top: 16px;">
+          Reiniciar Todo el Progreso
+        </button>
+      </section>
+
+      <!-- ===================================================================
+           SCREEN 5: ADD CUSTOM QUESTION
+           =================================================================== -->
+      <section id="screen-add_question" class="screen">
+        <h2 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 4px;">Crear Pregunta</h2>
+        <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 16px;">Contribuye al herbario y zoológico del conocimiento añadiendo preguntas.</p>
+
+        <form id="add-question-form" class="question-card" style="padding: 16px;">
+          <label style="font-size: 0.8rem; color: var(--text-dim); font-weight: 700; display: block; margin-bottom: 4px;">Rama Biológica:</label>
+          <select id="custom-q-category" class="input-field" style="margin-bottom: 14px;">
+            <option value="Botánica">🌱 Botánica</option>
+            <option value="Zoología">🦁 Zoología</option>
+            <option value="Genética">🧬 Fisiología y Genética</option>
+            <option value="Ecología">🌍 Ecología y Evolución</option>
+          </select>
+
+          <label style="font-size: 0.8rem; color: var(--text-dim); font-weight: 700; display: block; margin-bottom: 4px;">Enunciado de la Pregunta:</label>
+          <textarea id="custom-q-text" class="input-field" rows="3" placeholder="Ej: ¿Qué organelo celular realiza la síntesis proteica?" required style="resize: vertical; margin-bottom: 14px;"></textarea>
+
+          <label style="font-size: 0.8rem; color: var(--text-dim); font-weight: 700; display: block; margin-bottom: 4px;">Opciones de Respuesta:</label>
+          <input type="text" id="custom-q-opt0" class="input-field" placeholder="Opción A" required style="margin-bottom: 8px;">
+          <input type="text" id="custom-q-opt1" class="input-field" placeholder="Opción B" required style="margin-bottom: 8px;">
+          <input type="text" id="custom-q-opt2" class="input-field" placeholder="Opción C" required style="margin-bottom: 8px;">
+          <input type="text" id="custom-q-opt3" class="input-field" placeholder="Opción D" required style="margin-bottom: 14px;">
+
+          <label style="font-size: 0.8rem; color: var(--text-dim); font-weight: 700; display: block; margin-bottom: 4px;">¿Cuál es la respuesta correcta?</label>
+          <select id="custom-q-correct" class="input-field" style="margin-bottom: 14px;">
+            <option value="0">Opción A</option>
+            <option value="1">Opción B</option>
+            <option value="2">Opción C</option>
+            <option value="3">Opción D</option>
+          </select>
+
+          <label style="font-size: 0.8rem; color: var(--text-dim); font-weight: 700; display: block; margin-bottom: 4px;">Explicación Científica:</label>
+          <textarea id="custom-q-expl" class="input-field" rows="2" placeholder="Explica por qué es la respuesta correcta para enseñar al jugador..." required style="resize: vertical; margin-bottom: 18px;"></textarea>
+
+          <button type="submit" class="btn-primary">Guardar Pregunta en el Banco</button>
+        </form>
+      </section>
+
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-screen="levels">
+        <span class="icon">🗺️</span>
+        <span>Niveles</span>
+      </button>
+      <button class="nav-item" data-screen="leaderboard">
+        <span class="icon">🏆</span>
+        <span>Ranking</span>
+      </button>
+      <button class="nav-item" data-screen="add_question">
+        <span class="icon">➕</span>
+        <span>Crear</span>
+      </button>
+      <button class="nav-item" data-screen="profile">
+        <span class="icon">👤</span>
+        <span>Perfil</span>
+      </button>
+    </nav>
+
+    <!-- Result / Victory Modal -->
+    <div id="quiz-result-modal" class="modal-overlay">
+      <div class="modal-card">
+        <div id="modal-stars-row" class="result-stars-row">★★★</div>
+        <div id="modal-title" class="result-title">¡Nivel Superado!</div>
+        <div id="modal-subtitle" class="result-subtitle">Has demostrado tu conocimiento botánico.</div>
+
+        <div class="result-stats-grid">
+          <div class="result-stat-box">
+            <div id="modal-score-val" class="result-stat-val">1,250</div>
+            <div class="result-stat-lbl">Puntos</div>
+          </div>
+          <div class="result-stat-box">
+            <div id="modal-accuracy-val" class="result-stat-val">90%</div>
+            <div class="result-stat-lbl">Aciertos</div>
+          </div>
+          <div class="result-stat-box">
+            <div id="modal-streak-val" class="result-stat-val">🔥 5</div>
+            <div class="result-stat-lbl">Mejor Racha</div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button id="modal-retry-btn" class="btn-secondary">Reintentar</button>
+          <button id="modal-close-btn" class="btn-secondary">Niveles</button>
+          <button id="modal-next-btn" class="btn-primary" style="flex: 1.3;">Siguiente Nivel ➔</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/audio.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
